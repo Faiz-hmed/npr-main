@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: django-secretkey
+type: Opaque
+data:
+  SECRET_KEY: ZGphbmdvLWluc2VjdXJlLXM9MnliNiQhcGU4cDMkemY2ajgwNis2d2M3aXNkKnp3XyMmKHgmdHU2a2s3NzJvKTM5
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: net-config
+  namespace: default
+data:
+  OD_SERVICE_URL: "http://10.69.3.48:80/v1/models/NumPlateDetector:predict"
+  DEBUG: "false"
+  TIMEOUT: "60"
+  WORKERS: "1"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: main-ocr-deployment
+  labels:
+    app : crecognizer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app : crecognizer
+  template:
+    metadata:
+      labels:
+        app : crecognizer
+    spec:
+      containers:
+      - name: ms
+        image: gcr.io/lucky-outpost-354817/npr_api_service:v2.0
+        imagePullPolicy: Always
+
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+
+        envFrom:
+        - configMapRef:
+            name: net-config
+        - secretRef:
+            name: django-secretkey
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ocr-service
+spec:
+  selector:
+    app: crecognizer
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
