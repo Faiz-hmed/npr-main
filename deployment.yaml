@@ -20,7 +20,7 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: main-ocr-deployment
+  name: npr-main
   labels:
     app : crecognizer
 spec:
