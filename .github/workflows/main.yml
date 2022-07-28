@@ -9,7 +9,7 @@ env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   GKE_CLUSTER: mycluster
   GKE_REGION: asia-south1
-  DEPLOYMENT_NAME: main-ocr-deployment
+  DEPLOYMENT_NAME: npr-main
   IMAGE: npr-api-service
 
 jobs:
