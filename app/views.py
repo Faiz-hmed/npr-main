@@ -14,21 +14,32 @@ class LicenseReadViewSet(viewsets.ViewSet):
     @action(methods=['POST'], detail=False, url_name="text-only" , url_path="nums")
     def get_plate_text(self, request):
         serializer=ImageSerializer(data=request.data)
-        # print(request.data)
-
-        if serializer.is_valid():
-            v = serializer.validated_data
-            lpn_dict = {}
-
-            imgs_list = v.get('imgs')
-            ocr_engine = v.get('ocr_engine')
+        
+        lpn_dict = {}
+        imgs_list, ocr_engine = self.get_request_data(serializer) 
             
-            for img in imgs_list:
-                lpn_dict[img.name] = recognize_lpns([img], ocr_engine)[0]
-            
-            return Response(data=lpn_dict,status=status.HTTP_200_OK)
+        for img in imgs_list:
+            lpn_dict[img.name] = recognize_lpns([img], ocr_engine)[0]
+        
+        return Response(data=lpn_dict,status=status.HTTP_200_OK)
 
-        return Response(data="Invalid data!",status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['POST'],detail=False,url_name='boxes-text',url_path='boxes+nums')
+    def get_boxes_plate_text(self, request):
+        serializer=ImageSerializer(data=request.data)
+        imgs_list, ocr_engine = self.get_request_data(serializer) 
+
+        lp_bn_dict = {}
+        for img in imgs_list:
+            lp_bx,lpns = recognize_lpns([img],ocr_engine,return_boxes=True)
+            lp_bx = lp_bx[0]
+            sub_res = []
+
+            for i in range(len(lp_bx)):
+                sub_res.append([lpns[i], lp_bx[i]])
+            
+            lp_bn_dict[img.name] = sub_res
+
 
     def get_request_data(self, serializer):
 
