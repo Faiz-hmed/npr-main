@@ -1,9 +1,11 @@
 # from django.shortcuts import render
+from operator import is_
 from django.http import HttpResponse
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from .serializers import ImageSerializer
 from rest_framework.response import Response
+from rest_framework.exceptions import ParseError
 from .inference import recognize_lpns
 
 # Create your views here.
@@ -27,6 +29,17 @@ class LicenseReadViewSet(viewsets.ViewSet):
             return Response(data=lpn_dict,status=status.HTTP_200_OK)
 
         return Response(data="Invalid data!",status=status.HTTP_400_BAD_REQUEST)
+
+    def get_request_data(self, serializer):
+
+        if serializer.is_valid():
+            v = serializer.validated_data
+
+            imgs = v.get('imgs')
+            ocr = v.get('ocr_engine')
+            return (imgs, ocr)
+        else:
+            raise ParseError(detail="Invalid field data!")
 
 def liveness(request):
     return HttpResponse("Server is live!")
