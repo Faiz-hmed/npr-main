@@ -35,7 +35,7 @@ spec:
     spec:
       containers:
       - name: ms
-        image: gcr.io/lucky-outpost-354817/npr_api_service:v2.0
+        image: gcr.io/PROJECT_ID/IMAGE:TAG
         imagePullPolicy: Always
 
         ports:
