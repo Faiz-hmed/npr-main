@@ -1,7 +1,6 @@
 from .utils import *
 import pytesseract
-from PIL import Image, ImageDraw, ImageFont, ImageEnhance
-import numpy as np
+from PIL import Image, ImageEnhance
 
 def recognize(img):
     lpn = pytesseract.image_to_string(img)

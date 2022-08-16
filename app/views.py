@@ -1,5 +1,4 @@
 # from django.shortcuts import render
-from operator import is_
 from django.http import HttpResponse
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -12,7 +11,7 @@ from .inference import recognize_lpns
 class LicenseReadViewSet(viewsets.ViewSet):
 
     @action(methods=['POST'], detail=False, url_name="text-only" , url_path="nums")
-    def get_plate_text(self, request):
+    def plate_text(self, request):
         serializer=ImageSerializer(data=request.data)
         
         lpn_dict = {}
@@ -24,14 +23,15 @@ class LicenseReadViewSet(viewsets.ViewSet):
         return Response(data=lpn_dict,status=status.HTTP_200_OK)
 
 
-    @action(methods=['POST'],detail=False,url_name='boxes-text',url_path='boxes+nums')
-    def get_boxes_plate_text(self, request):
+    @action(methods=['POST'],detail=False,url_name='boxes-text',url_path="boxes-nums")
+    def boxes_w_plate_text(self, request):
         serializer=ImageSerializer(data=request.data)
         imgs_list, ocr_engine = self.get_request_data(serializer) 
 
         lp_bn_dict = {}
         for img in imgs_list:
             lp_bx,lpns = recognize_lpns([img],ocr_engine,return_boxes=True)
+            lpns = lpns[0]
             lp_bx = lp_bx[0]
             sub_res = []
 
@@ -40,6 +40,7 @@ class LicenseReadViewSet(viewsets.ViewSet):
             
             lp_bn_dict[img.name] = sub_res
 
+        return Response(data=lp_bn_dict,status=status.HTTP_200_OK)
 
     def get_request_data(self, serializer):
 

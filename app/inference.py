@@ -1,7 +1,6 @@
 import os
 from io import BytesIO
 
-import cv2
 import numpy as np
 from django.core.files.uploadedfile import TemporaryUploadedFile
 from PIL import Image
@@ -34,7 +33,7 @@ def transform(img_l):
     return img_l
 
 
-def recognize_lpns(imgs: list, return_boxes:bool =False ,ocr_engine=1):
+def recognize_lpns(imgs: list, ocr_engine=1, return_boxes:bool=False):
     lpns =[]
     lp_bx = []
     print("ocr engine inferred:",ocr_engine)
